@@ -58,5 +58,6 @@ def get_apod_image_url(apod_info_dict):
         print("Unknown media type for APOD")
         return None
 
+
 if __name__ == '__main__':
     main()
