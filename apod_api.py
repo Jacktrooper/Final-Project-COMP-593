@@ -1,9 +1,21 @@
 '''
 Library for interacting with NASA's Astronomy Picture of the Day API.
 '''
+import requests
+from datetime import date
+import datetime
+
+NASA_APOD_URL = "https://api.nasa.gov/planetary/apod"
 
 def main():
     # TODO: Add code to test the functions in this module
+    apod_date = datetime.date(2022, 2, 21)
+    apod_info = get_apod_info(apod_date)
+    if apod_info:
+        print(apod_info["title"])
+        apod_image_url = get_apod_image_url(apod_info)
+        print(apod_image_url)
+
     return
 
 def get_apod_info(apod_date):
@@ -16,7 +28,15 @@ def get_apod_info(apod_date):
     Returns:
         dict: Dictionary of APOD info, if successful. None if unsuccessful
     """
-    return   
+    if isinstance(apod_date, str):
+        apod_date = date.today().strftime('%Y-%m-%d')
+    params = {'date': apod_date, 'api_key': '6kNeT0r4ipbCnx8rfwsbdbuVZHhISOc12kABGNS5'}
+    response = requests.get(NASA_APOD_URL, params=params)
+    if response.status_code == requests.codes.ok:
+        return response.json()
+    else:
+        print(f"Failed to get APOD info for {apod_date}")
+        return None  
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.
@@ -30,7 +50,13 @@ def get_apod_image_url(apod_info_dict):
     Returns:
         str: APOD image URL
     """
-    return
+    if apod_info_dict['media_type'] == 'image':
+        return apod_info_dict['hdurl']
+    elif apod_info_dict['media_type'] == 'video':
+        return apod_info_dict['thumbnail_url']
+    else:
+        print("Unknown media type for APOD")
+        return None
 
 if __name__ == '__main__':
     main()
